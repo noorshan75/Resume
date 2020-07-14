@@ -1,0 +1,131 @@
+*{
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+body{
+    background-color: rgb(29, 29, 39);
+    margin: 10px 0px;
+}
+
+.container{
+    border: 1px solid black;
+    width: 850px;
+    height: 1100px;
+    margin: auto;
+    background-color: rgb(247, 243, 247);
+    border-radius: 20px;
+}
+
+.header{
+    border: 1px solid black;
+    width: 850px;
+    height: 120px;
+    background-color: darkblue;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    color: white;
+    padding: 10px 50px;
+}
+
+.webdev{
+    padding-left: 50px;
+    padding-top: 3px;
+}
+
+.list{
+    padding-top: 15px;
+}
+
+.list li{
+    list-style: none;
+    font-size: 14px;
+    padding-top: 3px;
+}
+
+.object{
+    width: 650px;
+    height: 70px;
+    margin-left: 81px;
+    margin-top: 30px;
+    /* background-color: teal; */
+}
+
+.acadmy{
+    width: 700px;
+    height: 100px;
+    margin-left: 50px;
+    margin-top: 0px;
+    /* background-color: teal; */
+}
+
+.acadmy ul{
+    padding: 5px;
+
+}
+
+.acadmy li{
+    /* list-style: none; */
+    font-size: 14px;
+    padding-top: 3px;
+    margin-left: 40px;
+}
+
+.skill{
+    width: 700px;
+    height: 80px;
+    margin-left: 50px;
+    margin-top: 20px;
+    /* background-color: teal; */
+}
+
+.skill ul{
+    padding: 5px;
+
+}
+
+.skill li{
+    /* list-style: none; */
+    font-size: 14px;
+    padding-top: 3px;
+    margin-left: 40px;
+}
+
+.Project{
+    width: 700px;
+    height: 160px;
+    margin-left: 50px;
+    margin-top: 10px;
+    /* background-color: teal; */
+}
+
+.Project ul{
+    padding: 5px;
+}
+
+.Project li{
+    /* list-style: none; */
+    font-size: 14px;
+    padding-top: 3px;
+    margin-left: 40px;
+}
+
+.strength{
+    width: 700px;
+    height: 110px;
+    margin-left: 50px;
+    margin-top: 50px;
+    /* background-color: teal; */
+}
+
+.strength ul{
+    padding: 5px;
+}
+
+.strength li{
+    /* list-style: none; */
+    font-size: 14px;
+    padding-top: 3px;
+    margin-left: 40px;
+}
