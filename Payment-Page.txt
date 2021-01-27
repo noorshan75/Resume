@@ -1,0 +1,379 @@
+import React, { Component, useState, useEffect } from "react"
+import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { orderActions } from "../../store/_actions";
+// import StripeCheckout from "react-stripe-checkout";
+import { Button, Row, Col, Card, Container, Form, Breadcrumb, Modal } from "react-bootstrap";
+import { loadStripe } from "@stripe/stripe-js";
+import {
+    CardElement,
+    Elements,
+    CardNumberElement,
+    useStripe,
+    useElements
+} from "@stripe/react-stripe-js";
+
+const stripePromise = loadStripe("pk_test_2pvmef7iSEXcggSUhQWPwKKO00xbfBGgZO");
+const Form2 = (props) => {
+    const stripe = useStripe();
+    const elements = useElements();
+    const [billingDetails, setBillingDetails] = useState({
+        name: "",
+        country: ""
+      });
+    const [isModal, setisModal] = useState(false)
+    const [payment, setPayment] = useState({
+        // isModal: false,
+        // cardNumber: "",
+        // month: "",
+        // expiry: "",
+        // cvv: "",
+        name:"",
+        country: "",
+        // zip: "",
+        coupon: "",
+    })
+    const handleChange = (e) => {
+        const name = e.target.name
+        setPayment({
+            ...payment,
+            [name]: e.target.value
+        })
+
+    };
+
+    // componentDidMount() {
+    //     const formData = props.location.state.formData
+    //     this.props.submitOrder(formData);
+
+    //     // console.log(this.props)
+
+    // }
+    useEffect(() => {
+        const formData = props.location.state.formData
+        props.submitOrder(formData);
+    }, [])
+
+
+    const handleSubmit1 = async (event) => {
+        // Block native form submission.
+
+        event.preventDefault();
+
+        // setSubscribing(true);
+
+        if (!stripe || !elements) {
+            // Stripe.js has not loaded yet. Make sure to disable
+            // form submission until Stripe.js has loaded.
+            return;
+        }
+
+        // Get a reference to a mounted CardElement. Elements knows how
+        // to find your CardElement because there can only ever be one of
+        // each type of element.
+        const cardElement = elements.getElement(CardElement);
+
+        // If a previous payment was attempted, get the lastest invoice
+        // const latestInvoicePaymentIntentStatus = localStorage.getItem(
+        //   'latestInvoicePaymentIntentStatus'
+        // );
+
+        // Use your card Element with other Stripe.js APIs
+        const { error, paymentMethod } = await stripe.createPaymentMethod({
+            type: "card",
+            card: cardElement
+        });
+
+        if (error) {
+            console.log("[createPaymentMethod error]", error);
+            // setSubscribing(false);
+            //   setErrorToDisplay(error && error.message);
+            return;
+        }
+        console.log("[PaymentMethod]", paymentMethod);
+        const paymentMethodId = paymentMethod.id;
+        console.log("payment id", paymentMethodId);
+        // if (latestInvoicePaymentIntentStatus === 'requires_payment_method') {
+        //   // Update the payment method and retry invoice payment
+        //   const invoiceId = localStorage.getItem('latestInvoiceId');
+        //   retryInvoiceWithNewPaymentMethod({
+        //     paymentMethodId: paymentMethodId,
+        //     invoiceId: invoiceId,
+        //   });
+        //   return;
+        // }
+
+        // Create the subscription
+        // createSubscription({
+        //   paymentMethodId: paymentMethodId,
+        // });
+    };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const payment1 = {
+            cardNumber: payment.cardNumber,
+            month: payment.month,
+            expiry: payment.expiry,
+            cvv: payment.cvv,
+            country: payment.country,
+            zip: payment.zip,
+            coupon: payment.coupon,
+        }
+        console.log(payment1)
+
+    }
+    // onToken(token) {
+    //     console.log(token);
+    // }
+    const applyCoupon = (e, couponId) => {
+        e.preventDefault();
+
+        const formData = props.location.state.formData
+        formData.coupon = couponId
+        console.log(formData)
+        props.submitOrder(formData);
+
+
+    }
+
+    const { invoice, error } = props.addOrder
+    // const {invoice}=addOrder
+    if (error) {
+        console.log("error", error)
+    }
+    var value = {};
+    var amount = {}
+    var discount = 0
+
+    if (invoice) {
+        value = invoice.invoice
+        console.log(value)
+        amount = value.total_tax_amounts[0]
+        discount = value.total_discount_amounts.map((disAmount) => disAmount.amount)
+
+        console.log(discount[0])
+    }
+
+
+    return (
+        <Container>
+            <div className="text-center" style={{ marginTop: '50px' }}>
+                <Breadcrumb>
+                    <Link to="#" >Billing Information</Link>/
+                    <Link to="/payment" selected>
+                        Payment
+                    </Link>/
+                    <Link to="#" >Setup Probyto AI</Link>
+
+                </Breadcrumb>
+            </div>
+            <Row style={{ marginTop: '100px' }}>
+                <Col md>
+                    <Card style={{ border: 'none' }}>
+                        <h2 className="mb-5">Payment</h2>
+                        <Container><h4></h4>
+                            <Form>
+                                <Form.Group controlId="card-number">
+                                    <Form.Control type="number" placeholder="Credit card number" name="cardNumber" onChange={handleChange} value={payment.cardNumber} />
+
+                                </Form.Group>
+                                <Form.Group controlId="month">
+                                    <Form.Control as="select" type="text" name="month" onChange={handleChange} value={payment.month} >
+                                        <option>Month</option>
+                                        <option value="January">January</option>
+                                        <option value="Febuary">Febuary</option>
+                                        <option value="March">March</option>
+                                        <option value="April">April</option>
+                                        <option value="May">May</option>
+                                        <option value="June">June</option>
+                                        <option value="July">July</option>
+
+
+                                    </Form.Control>
+                                    <span id="invalid-month" style={{ color: 'red', fontSize: '10px' }}></span>
+                                </Form.Group>
+                                <Form.Group controlId="expiry">
+                                    <Form.Control as="select" type="text" name="expiry" onChange={handleChange} value={payment.expiry}  >
+                                        <option >Year</option>
+                                        <option value="2021">2021</option>
+                                        <option value="2022">2022</option>
+                                        <option value="2023">2023</option>
+                                        <option value="2024">2024</option>
+
+                                    </Form.Control>
+
+                                </Form.Group>
+                                <Form.Group controlId="cvv-number">
+                                    <Form.Control type="number" placeholder="CVV" name="cvv" onChange={handleChange} value={payment.cvv} />
+                                </Form.Group>
+
+                                <Form.Group controlId="country" >
+                                    <Form.Control as="select" name="country" onChange={handleChange} value={payment.country}>
+                                        <option >Country</option>
+                                        <option value="India">India</option>
+                                        <option value="Brazil">Brazil</option>
+                                        <option value="Algeria">Algeria</option>
+
+                                    </Form.Control>
+
+                                </Form.Group>
+                                <Form.Group controlId="zip-code" >
+                                    <Form.Control type="number" placeholder="Zip" name="zip" onChange={handleChange} value={payment.zip} />
+                                    <span id="invalid-zip" style={{ color: 'red', fontSize: '10px' }}></span>
+                                </Form.Group>
+                                {/* //stripe */}
+
+                                {/* <StripeCheckout
+                                    amount="500"
+                                    billingAddress
+                                    description="Awesome Product"
+                                    locale="auto"
+                                    name="YourDomain.tld"
+                                    stripeKey="pk_test_2pvmef7iSEXcggSUhQWPwKKO00xbfBGgZO"
+                                    token={this.onToken}
+                                    zipCode
+                                    label="Pay"
+                                /> */}
+
+                            </Form>
+                            {/* //card Element */}
+                            <Form id="payment-form" onSubmit={handleSubmit1}>
+                                <div className="flex flex-wrap -mx-3 mb-3">
+                                    <div className="w-full px-3 mb-0">
+                                        <label className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
+                                            Card
+                                        </label>
+                                        <div
+                                            className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded-md py-3 px-2 leading-tight focus:outline-none focus:bg-white"
+                                            id="card-element"
+                                            style={{borderRadius:'6px'}} >
+                                            <CardElement 
+                                                options={{
+                                                    style: {
+                                                        base: {
+                                                            fontSize: "16px",
+                                                            color: "#32325d",
+                                                            fontFamily:
+                                                                "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif",
+                                                            "::placeholder": {
+                                                                color: "#a0aec0"
+                                                            }
+                                                           
+                                                        },
+                                                        invalid: {
+                                                            color: "#9e2146"
+                                                        }
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <Button
+                                    id="submit-premium"
+                                    className=" w-full bg-pasha hover:bg-white hover:shadow-outline hover:text-pasha hover:border hover:border-black focus:shadow-outline text-white focus:bg-white focus:text-pasha font-light py-2 px-4 rounded-md"
+                                    type="submit"
+                                >
+                                   Pay
+                           </Button>
+                            </Form>
+                        </Container>
+                    </Card>
+                </Col>
+
+                <Col className="ml" md>
+                    <Card style={{ border: 'none' }}>
+                        <Container className="mt-1">
+                            {props.location.state.formData.id == 0 ? <h3>Standard Subscription {Math.round(value.subtotal / 100)}/month</h3> : <h3>Premium Subscription {value.subtotal}/month</h3>}
+
+
+
+                            <div className=" text-center mt-5">
+                                <h6 className="text-center">
+                                    <Card style={{ backgroundColor: '#8080806b', height: '25px', borderRadius: '5px' }}>
+                                        <Row>
+                                            <Col sm={6} md> Subtotal</Col>
+                                            <Col sm={6} md>{Math.round((value.subtotal - discount) / 100)}</Col>
+                                        </Row>
+                                    </Card></h6>
+                                <Form.Group controlId="coupon" style={{ display: 'flex', flexDirection: 'row', border: '1px solid #80808073', borderRadius: '4px' }}>
+
+                                    <Form.Control type="text" placeholder="Apply Coupon" style={{ border: 'none' }} name="coupon" onChange={handleChange} value={payment.coupon} />
+
+                                    <Button style={{ backgroundColor: 'lightgray', color: 'black', border: 'none' }} onClick={(e) => { applyCoupon(e, payment.coupon) }}>Apply</Button>
+
+                                </Form.Group>
+                                <span style={{ color: 'red', fontSize: '12px' }}>{error ? error : null}</span>
+                                <h6 className="text-center">
+                                    <Card style={{ backgroundColor: '#8080806b', height: '25px', borderRadius: '5px' }}>
+                                        <Row>
+                                            <Col sm={6} md>GST18%(Inclusive)</Col>
+                                            <Col sm={6} md> {Math.round((amount.amount) / 100)}</Col>
+                                        </Row>
+                                    </Card></h6>
+                                <h6 className="text-center">
+                                    <Card style={{ backgroundColor: '#8080806b', height: '25px', borderRadius: '5px' }}>
+                                        <Row>
+                                            <Col sm={6} md>Discount</Col>
+                                            {discount == 0 ? <Col sm={6} md>0</Col> : <Col sm={6} md>{Math.round((discount) / 100)}</Col>}
+                                        </Row>
+                                    </Card></h6>
+                                <h6 className="text-center">
+                                    <Card style={{ backgroundColor: '#8080806b', height: '25px', borderRadius: '5px' }}>
+                                        <Row>
+                                            <Col sm={6} md>Total</Col>
+                                            <Col sm={6} md> {Math.round((value.total - discount) / 100)}</Col>
+                                        </Row>
+                                    </Card></h6>
+                                <Button className="btn btn-primary mb-2" type="submit" style={{ borderRadius: '15px' }} onClick={(e) => handleSubmit(e)}>
+                                    Start free trial
+                                </Button>
+                            </div>
+
+                        </Container>
+                    </Card>
+                </Col>
+            </Row>
+
+            {/* //Modal */}
+            <Modal
+                size="md"
+                show={isModal}
+                onHide={() => setisModal(true)}
+                aria-labelledby="example-modal-sizes-title-sm"
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title id="example-modal-sizes-title-sm">
+                        Payment Successful
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="text-center">
+                    <div style={{ marginLeft: '-25px' }}>
+                        <Link className="btn btn-primary m-4" exact to="/setup-probyto-ai">Setup Probyto AI</Link>
+
+                        <Link className="btn btn-primary m-4" to="/payment" onClick={() => setisModal(false)}>Close</Link>
+                    </div>
+                </Modal.Body>
+            </Modal>
+        </Container>);
+
+
+
+}
+function mapState(state) {
+    const { addOrder, invoice } = state;
+
+    return { addOrder, invoice };
+
+}
+const actionCreators = {
+    submitOrder: orderActions.addOrder,
+
+}
+const Payment2 = (props) => (
+    <Elements stripe={stripePromise}>
+        <Form2 {...props} />
+    </Elements>
+);
+export default connect(mapState, actionCreators)(Payment2);
